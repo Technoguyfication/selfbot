@@ -51,7 +51,6 @@ function HandleMessage(msg)
 		{
 			var unprefixed = msg.content.slice(Config.Bot.Prefix.length);
 			var command = unprefixed.split(/ (.+)/);
-			console.log(command);
 			for (var cmd in Commands)
 			{
 				if (cmd == command[0])
