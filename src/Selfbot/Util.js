@@ -19,6 +19,8 @@ function Emojify(content)
 	{
 		if (content[i].toLowerCase() == 'b')
 			builder += ":b:";
+		else if (content[i] === ' ')
+			builder += '     ';
 		else if (content[i].match(/[A-z]+/))	// character is a letter, substitute into regional indicator
 			builder += `:regional_indicator_${content[i].toLowerCase()}:`;
 		else if (content[i].match(/[0-9]/))	// character is a number, spell it out using array above

@@ -26,10 +26,18 @@ BotClient.on('message', (msg) => {
 		}
 	}
 	
-	switch(msg.content)
+	switch(msg.content.toLowerCase())
 	{
 		case "ok":
 			msg.react("🆗").catch(SC);
 			break;
+		case "america":
+		case "murica":
+		case "usa":
+			msg.react("🇺🇸").catch(SC);
+			break
+		case "succ":
+		case "good succ":
+			msg.react("🍆").catch(SC);
 	}
 });
