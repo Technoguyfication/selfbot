@@ -1,5 +1,5 @@
 global.BotClient = new Discord.Client();
-const Util = require('./Util.js');
+global.Util = require('./Util.js');
 
 function Start()
 {
@@ -17,8 +17,7 @@ function Start()
 	
 	logger.debug("Winston started!");
 	
-	BotClient.on('message', HandleMessage);
-	BotClient.on('ready', BotReady);
+	require('./Events.js');
 	
 	BotClient.login(Config.Client.Token).then((token) => {
 		logger.verbose(`Logged in with token ${token}`);
@@ -32,41 +31,6 @@ function BotReady()
 	logger.info("Bot ready!");
 }
 
-function HandleMessage(msg)
-{
-	const Commands = {
-		"emoji": (msg, args) => {
-			msg.edit(Util.Emojify(args));
-		}
-	};
-	
-	if (!msg.author.equals(BotClient.user))
-		return;
-	
-	logger.verbose(`Recv: ${msg.content}`);
-	
-	try
-	{
-		if (msg.content.startsWith(Config.Bot.Prefix))
-		{
-			var unprefixed = msg.content.slice(Config.Bot.Prefix.length);
-			var command = unprefixed.split(/ (.+)/);
-			for (var cmd in Commands)
-			{
-				if (cmd == command[0])
-				{
-					logger.info(`Running Command: ${command[0]}`);
-					Commands[cmd](msg, command[1]);
-				}
-			}
-		}
-	}
-	catch (ex)
-	{
-		logger.warn(`Error handling message: ${ex}`);
-	}
-}
-
 process.on("SIGINT", Halt);
 process.on("SIGTERM", Halt);
 
@@ -75,6 +39,19 @@ function Halt()
 	console.log("Stopping...");
 	process.exit(0);
 }
+global.Halt = Halt;
 
+function Restart()
+{
+	child_process.spawn('node', ["index.js"], { detached: true, shell: true });
+	Halt();
+}
+global.Restart = Restart;
+
+function SC(err)	// simple catch
+{
+	logger.warn(err);
+}
+global.SC = SC;
 
 module.exports.Start = Start;

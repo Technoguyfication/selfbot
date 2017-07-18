@@ -17,7 +17,8 @@ try
 	
 	global.fs = require('fs');
 	global.util = require('util');
-	global.exec = require('child_process').exec;
+	global.child_process = require('child_process');
+	global.path = require('path');
 	
 	global.Config = require('./cfg/config.json');
 	

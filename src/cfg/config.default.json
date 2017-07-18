@@ -11,6 +11,6 @@
 		"FilePattern": "yyyy-M-d.log"
 	},
 	"Bot": {
-		"Prefix": ".."
+		"Prefix": "s."
 	}
 }
