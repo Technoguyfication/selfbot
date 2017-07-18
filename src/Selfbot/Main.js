@@ -41,13 +41,6 @@ function Halt()
 }
 global.Halt = Halt;
 
-function Restart()
-{
-	child_process.spawn('node', ["index.js"], { detached: true, shell: true });
-	Halt();
-}
-global.Restart = Restart;
-
 function SC(err)	// simple catch
 {
 	logger.warn(err);
