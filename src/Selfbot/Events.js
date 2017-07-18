@@ -8,21 +8,14 @@ BotClient.on('message', (msg) => {
 	{
 		var unprefixed = msg.content.slice(Config.Bot.Prefix.length);
 		var command = unprefixed.split(/ (.+)/);	// split on first space
-		for (var cmd in Commands)
+		try
 		{
-			if (cmd == command[0])
-			{
-				logger.info(`Running Command: ${command[0]} ${command[1]||""}`);
-				try
-				{
-					Commands[cmd](msg, command[1]);
-				}
-				catch(ex)
-				{
-					logger.warn(`Unhandled exception in command: ${ex}`);
-				}
-				break;
-			}
+			if (Commands.Run(command[0], msg, command[1]))
+				logger.info(`Running: ${command[0]} ${command[1]||""}`);
+		}
+		catch(ex)
+		{
+			logger.warn(`Unhandled exception in command: ${ex}`);
 		}
 	}
 	
@@ -35,7 +28,7 @@ BotClient.on('message', (msg) => {
 		case "murica":
 		case "usa":
 			msg.react("🇺🇸").catch(SC);
-			break
+			break;
 		case "succ":
 		case "good succ":
 			msg.react("🍆").catch(SC);
