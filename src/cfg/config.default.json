@@ -8,7 +8,7 @@
 	"Logging": {
 		"Level": "info",
 		"UseJSON": false,
-		"FilePattern": "yyy-M-d.log"
+		"FilePattern": "yyyy-M-d.log"
 	},
 	"Bot": {
 		"Prefix": ".."

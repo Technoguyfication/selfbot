@@ -8,8 +8,8 @@ function Start()
 		transports: [
 			new (Winston.transports.Console)(),
 			new WDRF({
-				filename: './logs/',
-				datePattern: Config.Logging.FilePattern,
+				filename: 'logs/',
+				datePattern: '/' + Config.Logging.FilePattern,
 				json: Config.Logging.UseJSON
 			})
 		]
