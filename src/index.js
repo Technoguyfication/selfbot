@@ -17,7 +17,7 @@ try
 	global.util = require('util');
 	global.exec = require('child_process').exec;
 	
-	require('Selfbot/main.js').Start();
+	require('Selfbot/Main.js').Start();
 }
 catch(err)
 {
