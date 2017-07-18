@@ -7,11 +7,11 @@
     "jshint": "^2.6.0"
   },
   "dependencies": {
-  	"discord.js": "*",
-  	"winston": "*",
-  	"request": "*",
-	"winston-daily-rotate-file": "*",
-	"mysql": "*"
+    "discord.js": "*",
+    "winston": "*",
+    "request": "*",
+    "winston-daily-rotate-file": "*",
+    "mysql": "*"
   },
   "scripts": {
     "test": "node ./node_modules/jshint/bin/jshint index.js Selfbot/"
