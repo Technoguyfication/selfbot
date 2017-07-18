@@ -15,14 +15,21 @@ function Start()
 		]
 	});
 	
-	logger.debug("Winston started!");
+	logger.verbose("Starting database");
+	global.Database = require('./Database.js');
 	
-	require('./Events.js');
+	Database.Init().then(() => {
+		require('./Events.js');
 	
-	BotClient.login(Config.Client.Token).then((token) => {
-		logger.verbose(`Logged in with token ${token}`);
+		BotClient.login(Config.Client.Token).then((token) => {
+			logger.verbose(`Logged in with token ${token}`);
+		}).catch((err) => {
+			logger.error(`Failed to login: ${err}`);
+		});
 	}).catch((err) => {
-		logger.error(`Failed to login: ${err}`);
+		logger.error(`Database init error: ${err}`);
+		Halt(1);
+		return;
 	});
 }
 
@@ -34,10 +41,10 @@ function BotReady()
 process.on("SIGINT", Halt);
 process.on("SIGTERM", Halt);
 
-function Halt()
+function Halt(code = 0)
 {
 	console.log("Stopping...");
-	process.exit(0);
+	process.exit(code);
 }
 global.Halt = Halt;
 

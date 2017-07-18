@@ -12,5 +12,11 @@
 	},
 	"Bot": {
 		"Prefix": "s."
+	},
+	"MySQL": {
+		"Host": "mysql.example.com",
+		"User": "mydatabaseuser",
+		"Password": "mysupersecurepassword",
+		"Database": "selfbot"
 	}
 }

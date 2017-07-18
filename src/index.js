@@ -14,6 +14,7 @@ try
 	global.Winston = require('winston');
 	global.WDRF = require('winston-daily-rotate-file');
 	global.Request = require('request');
+	global.MySQL = require('mysql');
 	
 	global.fs = require('fs');
 	global.util = require('util');
