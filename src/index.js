@@ -6,6 +6,8 @@
 	it's all crappy code anyways
 */
 
+var main;
+
 try
 {
 	global.Discord = require('discord.js');
@@ -17,10 +19,15 @@ try
 	global.util = require('util');
 	global.exec = require('child_process').exec;
 	
-	require('Selfbot/Main.js').Start();
+	global.Config = require('./cfg/config.json');
+	
+	main = require('./Selfbot/Main.js');
 }
 catch(err)
 {
 	console.error(`Error loading dependencies: ${err}`);
+	console.log("Try running \"npm update\" or make a config file.");
 	process.exit(1);
 }
+
+main.Start();

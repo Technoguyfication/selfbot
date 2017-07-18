@@ -1,0 +1,16 @@
+{
+	"Client": {
+		"Token": "Client-Token-Here",
+		"Options": {
+			"sync": true
+		}
+	},
+	"Logging": {
+		"Level": "info",
+		"UseJSON": false,
+		"FilePattern": "yyy-M-d.log"
+	},
+	"Bot": {
+		"Prefix": ".."
+	}
+}
