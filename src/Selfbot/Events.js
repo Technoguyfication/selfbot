@@ -12,7 +12,7 @@ BotClient.on('message', (msg) => {
 		{
 			if (cmd == command[0])
 			{
-				logger.info(`Running Command: ${command[0]}`);
+				logger.info(`Running Command: ${command[0]} ${command[1]||""}`);
 				try
 				{
 					Commands[cmd](msg, command[1]);
