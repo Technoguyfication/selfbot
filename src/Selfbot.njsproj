@@ -22,9 +22,6 @@
     <Compile Include="Selfbot\Cache.js">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Selfbot\Permissions.js">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Selfbot\Utility.js">
       <SubType>Code</SubType>
     </Compile>

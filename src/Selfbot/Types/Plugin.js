@@ -1,8 +1,6 @@
 /*
 	Plugin definition
 	
-	Copyright Hayden Andreyka 2017 All rights reserved.
-	
 	Usage: Base definition for plugins
 	       All methods except ctor must return a promise
 */
@@ -21,11 +19,6 @@ class Plugin extends EventEmitter {
 				'top': {
 					description: 'does stuff',
 					usage: 'top (kek) [lel/lol]'
-					permissions: {
-						bot: Permissions.BotPermissions.USER,
-						discord: [ 'MANAGE_MESSAGES', 'READ_MESSAGES' ],	// 'SEND_MESSAGES', and 'READ_MESSAGES' aren't really needed
-						guild: Permissions.GuildPermissions.MODERATOR
-					},
 					scope: Commands.CommandScope.ALL,
 					alias: null		// if not null this WILL alias another command no matter what
 				},

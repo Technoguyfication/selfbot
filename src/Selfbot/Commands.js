@@ -11,47 +11,28 @@ const builtinCommands = {
 	'eval': {
 		description: 'Evaluates a JavaScript expression.',
 		usage: 'eval (expression)',
-		permissions: {
-			bot: Permissions.BotPermissions.ADMIN,
-			discord: [],
-			guild: Permissions.GuildPermissions.USER
-		},
 		scope: CommandScope.ALL
 	},
 	'exec': {
 		description: 'Runs a command at the local command line.',
 		usage: 'exec (command)',
-		permissions: {
-			bot: Permissions.BotPermissions.ADMIN,
-			discord: [],
-			guild: Permissions.GuildPermissions.USER
-		},
 		scope: CommandScope.ALL
 	},
 	'help': {
 		description: 'Displays a list of commands or the help topic for a specific command.',
 		usage: 'help [command]',
-		permissions: {
-			bot: Permissions.BotPermissions.USER,
-			discord: [],
-			guild: Permissions.GuildPermissions.USER
-		},
 		scope: CommandScope.ALL
 	},
 };
 module.exports.builtinCommands = builtinCommands;
 
 function isValidCommand(msg) {
-	return new Promise((resolve, reject) => {
-		Utility.getCommandPrefixes(msg).then(prefixes => {
-			for (var i = 0; i < prefixes.length; i++) {
-				if (msg.content.startsWith(prefixes[i]))
-					return resolve({ isCommand: true, prefix: prefixes[i] });	// return prefix aswell so we don't have to find it twice
-			}
+	for (var i = 0; i < prefixes.length; i++) {
+		if (msg.content.startsWith(prefixes[i]))
+			return { isCommand: true, prefix: prefixes[i] };	// return prefix aswell so we don't have to find it twice
+	}
 
-			return resolve(false, null);
-		}).catch(reject);
-	});
+	return { isCommand: false };
 }
 module.exports.isValidCommand = isValidCommand;
 
@@ -84,15 +65,7 @@ function runCommand(msg, prefix) {
 				} else
 					break;
 			default:
-				commandError(msg, null);
 				return resolve();
-		}
-
-		let commandDeny = Permissions.commandDenied(msg, cmdInfo);
-
-		if (commandDeny) {
-			commandErrorResponse(msg, `Permission error(s) running command \`${command.cmd}}\`: ${commandDeny}`);
-			return resolve();
 		}
 
 		if (!cmdInfo) {
@@ -117,16 +90,7 @@ module.exports.runCommand = runCommand;
 
 function commandErrorResponse(msg, message = 'An error occured processing your command.', er = null) {
 	return new Promise((resolve, reject) => {
-		var extratext = "";
-		if (response)
-			extratext += response;
-
-		if (er && Utility.isBotAdmin(msg.author)) {
-			extratext += `\n\nError Details:\n\`${(er.message || er)}\``;
-			if (er.stack)
-				extratext += `\n\nStacktrace:\n\`\`\`\n${er.stack}\n\`\`\``;
-		}
-		msg.channel.send(message + (extratext || '')).then(resolve).catch(Utility.messageCatch);
+		msg.edit(`:no_entry: ${message}`).then(resolve, reject);
 	});
 }
 

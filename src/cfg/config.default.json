@@ -1,23 +1,17 @@
 {
 	"Bot": {
-		"Admins": [ "Snowflake", "Snowflake" ]
+		"Prefixes": [ "s." ]
 	},
 	"Discord": {
 		"Token": "my-authentication-key-here",
-		"Prefix": {
-			"Prefixes": [ ">>", "!", ">", "^" ],
-			"Mention": true
-		},
 		"ClientOptions": {
 			"fetchAllMembers": true,
-			"ws": {
-				"large_threshold": 50
-			}
+			"sync": true
 		}
 	},
 	"Logging": {
 		"Level": "info",
-		"Prefix": "lexi-",
+		"Prefix": "",
 		"DatePattern": "yyyy-M-d",
 		"Container": "logs",
 		"JSON": false
