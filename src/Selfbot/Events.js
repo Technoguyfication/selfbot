@@ -10,8 +10,12 @@ BotClient.on('message', (msg) => {
 		var command = unprefixed.split(/ (.+)/);	// split on first space
 		try
 		{
-			if (Commands.Run(command[0], msg, command[1]))
-				logger.info(`Running: ${command[0]} ${command[1]||""}`);
+			Commands.Run(command[0], msg, command[1]).then((ran) => {
+				if (ran)
+					logger.info(`Running: ${command[0]} ${command[1]||""}`);
+			}).catch((err) => {
+				logger.warn(`Error with command: ${err}`);
+			});
 		}
 		catch(ex)
 		{

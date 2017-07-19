@@ -63,7 +63,13 @@ function Run(cmd, msg, args) {
 				break;
 			}
 			case "cowsay": {
-				if (!args) {
+				var say = (content) => {
+					msg.edit(`\`\`\`${require('cowsay').say({text: content})}\n\`\`\``).then(() => {
+						return resolve(true);
+					}).catch(reject);
+				};
+					
+				if (!args) {				
 					Request.get("https://helloacm.com/api/fortune/", (err, res, body) =>
 					{
 						if (err)
@@ -86,12 +92,40 @@ function Run(cmd, msg, args) {
 				} else {
 					say(args);
 				}
-				
-				var say = (content) => {
-					msg.edit(`\`\`\`${require('cowsay').say({text: content})}\n\`\`\``).then(() => {
+				break;
+			}
+			case "query": {
+				Database.Query(args).then((results, fields) => {
+					let builder = "";
+					builder += JSON.stringify(results, null, 4);
+					msg.edit(`\`\`\`\n${builder}\n\`\`\``).then(() => {
 						return resolve(true);
 					}).catch(reject);
-				};
+				}).catch((err) => {
+					msg.edit(`Error running \`${args}\`\n\`\`\`\n${err}\n\`\`\``).then(() => {
+						return resolve(true);
+					}, reject);
+				});
+				break;
+			}
+			case "tag": {
+				Database.Query("SELECT `text` FROM `tags` WHERE `title` = ?", [args]).then((results, fields) => {
+					if (results.length < 1) {
+						msg.edit(`Tag \`${args}\` not found`).then(() => {
+							return resolve(true);
+						}, reject);
+						return;
+					}
+					
+					msg.edit(results[0].text).then(() => {
+						return resolve(true);
+					}, reject);
+					return resolve(true);
+				}, reject);
+				break;
+			}
+			case "addtag": {
+				
 				break;
 			}
 			default:

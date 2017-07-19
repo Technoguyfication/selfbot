@@ -3,7 +3,7 @@
 */
 
 const MySQLConfig = {
-	host: Config.MySQL.Hostname,
+	host: Config.MySQL.Host,
 	user: Config.MySQL.User,
 	password: Config.MySQL.Password,
 	database: Config.MySQL.Database,
