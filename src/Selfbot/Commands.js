@@ -27,6 +27,8 @@ const builtinCommands = {
 module.exports.builtinCommands = builtinCommands;
 
 function isValidCommand(msg) {
+	var prefixes = Config.Bot.Prefixes;
+
 	for (var i = 0; i < prefixes.length; i++) {
 		if (msg.content.startsWith(prefixes[i]))
 			return prefixes[i];
@@ -81,14 +83,14 @@ function runCommand(msg, prefix) {
 			return resolve();
 		}).catch(er => {
 			logger.warn(`(${msg.author.id}) Unhandled exception running command ${command.cmd} ${command.args.join(' ')}\n${er.stack}`);
-			commandErrorResponse(msg, null, er);
+			commandErrorResponse(msg, er);
 			return resolve();
 		});
 	});
 }
 module.exports.runCommand = runCommand;
 
-function commandErrorResponse(msg, message = 'An error occured processing your command.', er = null) {
+function commandErrorResponse(msg, message = 'An error occured processing your command.') {
 	return new Promise((resolve, reject) => {
 		msg.edit(`:no_entry: ${message}`).then(resolve, reject);
 	});
@@ -110,28 +112,29 @@ function internalCommandHandler(cmd, args, msg) {
 				}
 				let elapsedTime = Date.now() - startTime;
 
-				msg.edit(`Evaluated \`${evalString}\` in ${elapsed}ms\n\`\`\`\n${output}\n\`\`\``).catch(Utility.messageCatch);
+				msg.edit(`Evaluated \`${evalString}\` in ${elapsedTime}ms\n\`\`\`\n${output}\n\`\`\``).catch(Utility.messageCatch);
 				return resolve();
 			}
 			case 'exec': {
-				let execString = args.join(' ');
-				let startTime = Date.now();
-				child_process.exec(execString, processOutput);
-				let elapsed = Date.now() - startTime;
-
-				let processOutput = function(err, stdout, stderr) {
+				var processOutput = function (err, stdout, stderr) {
 					if (err)
 						return reject(err);
 
-					var returnText = `Processed \`${execString}\` in ${elapsed}ms\n`;
+					var returnText = `Processed \`${execString}\` in ${elapsed}ms\n\n`;
 
-					returnText += `STDOUT:\n\`\`\`\n${stdout||"\n"}\n\`\`\``;
+					returnText += `STDOUT:\n\`\`\`\n${stdout || "\n"}\n\`\`\``;
 
 					if (stderr)
 						returnText += `\n\nSTDERR:\n\`\`\`\n${stderr}\n\`\`\``;
 
 					msg.edit(returnText).catch(Utility.messageCatch);
 				}
+
+				let execString = args.join(' ');
+				let startTime = Date.now();
+				child_process.exec(execString, processOutput);
+				let elapsed = Date.now() - startTime;
+
 				return resolve();
 			}
 
