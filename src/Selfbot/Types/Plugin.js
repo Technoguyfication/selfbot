@@ -57,7 +57,6 @@ class Plugin extends EventEmitter {
 	// Entry point
 	onEnable() {
 		return new Promise((resolve, reject) => {
-			logger.warn(`onEnable not implemented.`);
 			return resolve();
 		});
 	}
@@ -65,7 +64,6 @@ class Plugin extends EventEmitter {
 	// Call for plugin to gracefully stop it's operations
 	onDisable() {
 		return new Promise((resolve, reject) => {
-			logger.warn(`onDisable not implemented.`);
 			return resolve();
 		});
 	}
@@ -73,7 +71,6 @@ class Plugin extends EventEmitter {
 	// command has been ran
 	onCommand(command, args, msg) {
 		return new Promise((resolve, reject) => {
-			logger.warn(`onCommand not implemented.`);
 			return resolve();
 		});
 	}

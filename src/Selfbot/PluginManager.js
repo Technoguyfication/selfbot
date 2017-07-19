@@ -133,6 +133,8 @@ function loadPlugin(plugin) {
 		_p.intName = internalPluginName(_p);		// give plugin int name
 		_p.status = PluginStatus.DISABLED;			// set status to loaded
 
+		_p.onDisable.bind(_p);
+
 		if (pluginList[_p.intName])
 			throw new Error('Plugin already loaded.');
 

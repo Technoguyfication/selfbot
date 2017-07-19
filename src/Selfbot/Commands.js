@@ -76,7 +76,7 @@ function runCommand(msg, prefix) {
 			return resolve();
 		}
 
-		logger.info(`${msg.author.id} / ${msg.author.name} executed command ${command.cmd} with args "${command.args.join(' ')}"`);
+		logger.info(`${msg.author.id} / ${msg.author.username} executed command ${command.cmd} with args "${command.args.join(' ')}"`);
 
 		executor(command.cmd, command.args, msg).then(() => {
 			logger.debug(`finished running command ${command.cmd}`);

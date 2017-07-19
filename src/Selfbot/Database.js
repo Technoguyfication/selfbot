@@ -42,6 +42,8 @@ module.exports.Query = Query;
 
 function Terminate() {
 	return new Promise((resolve, reject) => {
+		logger.info("Shutting down database");
+
 		if (!Connections)
 			return resolve();
 
@@ -61,7 +63,7 @@ function initDb() {
 				return reject(err);
 
 			Query(data, null).then(() => {
-				logger.debug('Database structure initialized.');
+				logger.debug('Database initialized.');
 				return resolve();
 			}, reject);
 		});

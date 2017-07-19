@@ -5,7 +5,7 @@ function resolveUserFromMention(string) {
 		string = string.msg;
 
 	if (string.match(Discord.MessageMentions.USERS_PATTERN)) {
-		return string.replace(/\D/, '');
+		return string.replace(/\D/, '');	// replace non digits with empty
 	}
 }
 module.exports.resolveUserFromMention = resolveUserFromMention;
