@@ -2,21 +2,21 @@
 	handles all database operations
 */
 
-const MySQLConfig = {
-	host: Config.MySQL.Host,
-	user: Config.MySQL.User,
-	password: Config.MySQL.Password,
+const mysqlConfig = {
+	host: Config.MySQL.Hostname,
+	user: Config.MySQL.Authentication.User,
+	password: Config.MySQL.Authentication.Password,
 	database: Config.MySQL.Database,
 	multipleStatements: true
 };
 
 var Connections;
 
-const initScript = __dirname + '/./Data/init.sql';
+const initScript = __dirname + '/./Data/initdb.sql';
 
 function Init() {
 	return new Promise((resolve, reject) => {
-		Connections = MySQL.createPool(MySQLConfig);
+		Connections = mysql.createPool(mysqlConfig);
 		logger.silly('pool created');
 		initDb().then(resolve, reject);
 	});

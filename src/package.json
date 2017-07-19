@@ -1,20 +1,19 @@
 {
-  "name": "technoguyfication-selfbot",
-  "description": "do not upload this to npm",
+  "name": "Lexi",
+  "description": "DO NOT PUBLISH THIS TO NPM",
   "author": "Hayden Andreyka <haydenandreyka@gmail.com>",
   "version": "1.0.0",
   "devDependencies": {
     "jshint": "^2.6.0"
   },
   "dependencies": {
-    "cowsay": "^1.1.9",
-    "discord.js": "*",
-    "mysql": "*",
-    "request": "*",
-    "winston": "*",
-    "winston-daily-rotate-file": "*"
+  	"discord.js": "*",
+  	"winston": "*",
+  	"request": "*",
+	"winston-daily-rotate-file": "*",
+	"mysql": "*"
   },
   "scripts": {
-    "test": "node ./node_modules/jshint/bin/jshint index.js Selfbot/"
+    "test": "node ./node_modules/jshint/bin/jshint Lexi/"
   }
 }

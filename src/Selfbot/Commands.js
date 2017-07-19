@@ -1,136 +1,197 @@
-function Run(cmd, msg, args) {
+// command manager that has everything to do with commands
+
+const CommandScope = {
+	ALL: 1,
+	GUILD: 2,
+	PRIVATE: 3
+};
+module.exports.CommandScope = CommandScope;
+
+const builtinCommands = {
+	'eval': {
+		description: 'Evaluates a JavaScript expression.',
+		usage: 'eval (expression)',
+		permissions: {
+			bot: Permissions.BotPermissions.ADMIN,
+			discord: [],
+			guild: Permissions.GuildPermissions.USER
+		},
+		scope: CommandScope.ALL
+	},
+	'exec': {
+		description: 'Runs a command at the local command line.',
+		usage: 'exec (command)',
+		permissions: {
+			bot: Permissions.BotPermissions.ADMIN,
+			discord: [],
+			guild: Permissions.GuildPermissions.USER
+		},
+		scope: CommandScope.ALL
+	},
+	'help': {
+		description: 'Displays a list of commands or the help topic for a specific command.',
+		usage: 'help [command]',
+		permissions: {
+			bot: Permissions.BotPermissions.USER,
+			discord: [],
+			guild: Permissions.GuildPermissions.USER
+		},
+		scope: CommandScope.ALL
+	},
+};
+module.exports.builtinCommands = builtinCommands;
+
+function isValidCommand(msg) {
 	return new Promise((resolve, reject) => {
-		switch(cmd.toLowerCase()) {
-			case "emojify":
-			case "emoji": {
-				msg.edit(Util.Emojify(args)).then(() => {
-					return resolve(true);
-				}).catch(reject);
-				break;
+		Utility.getCommandPrefixes(msg).then(prefixes => {
+			for (var i = 0; i < prefixes.length; i++) {
+				if (msg.content.startsWith(prefixes[i]))
+					return resolve({ isCommand: true, prefix: prefixes[i] });	// return prefix aswell so we don't have to find it twice
 			}
-			case "stop": {
-				msg.delete().then(() => {
-					Halt();
-					return resolve(true);
-				}).catch(SC);
+
+			return resolve(false, null);
+		}).catch(reject);
+	});
+}
+module.exports.isValidCommand = isValidCommand;
+
+function runCommand(msg, prefix) {
+	return new Promise((resolve, reject) => {
+		var command = parseCommand(msg.content, prefix);
+		var executor = PluginManager.getCommandExecutor(command.cmd);
+
+		if (!executor) {	// command does not exist
+			logger.debug(`Command ${command.cmd} does not exist.`);
+			return resolve();
+		}
+
+		let cmdInfo = PluginManager.getCommandInfo(command.cmd);
+
+		switch (cmdInfo.scope) {
+			case CommandScope.ALL:
 				break;
-			}
-			case "eval": {
-				let startTime = Date.now();
-				let endTime;
-				let result;
-				try {
-					result = eval(args);	// jshint ignore: line
-					endTime = Date.now();
-				} catch (ex) {
-					msg.edit(`Error evaluating \`${args}\`\n\`\`\`\n${ex}\n\`\`\``).then(() => {
-						return resolve(true);
-					}).catch(reject);
+			case CommandScope.GUILD:
+				if (msg.guild)
 					break;
+				else {
+					commandErrorResponse(msg, 'You can only run this command on a server.');
+					return resolve();
 				}
-				msg.edit(`Evaluated \`${args}\` in ${endTime-startTime}ms\n\`\`\`\n${result}\n\`\`\``).then(() => {
-					return resolve(true);
-				}).catch(reject);
-				break;
-			}
-			case "exec": {
+			case CommandScope.PRIVATE:
+				if (msg.guild) {
+					commandErrorResponse(msg, 'This command must be run in a direct message.');
+					return resolve();
+				} else
+					break;
+			default:
+				commandError(msg, null);
+				return resolve();
+		}
+
+		let commandDeny = Permissions.commandDenied(msg, cmdInfo);
+
+		if (commandDeny) {
+			commandErrorResponse(msg, `Permission error(s) running command \`${command.cmd}}\`: ${commandDeny}`);
+			return resolve();
+		}
+
+		if (!cmdInfo) {
+			logger.warn(`${command.cmd} has no info!`);
+			commandErrorResponse(msg, 'Command info not found.');
+			return resolve();
+		}
+
+		logger.info(`${msg.author.id} / ${msg.author.name} executed command ${command.cmd} with args "${command.args.join(' ')}"`);
+
+		executor(command.cmd, command.args, msg).then(() => {
+			logger.debug(`finished running command ${command.cmd}`);
+			return resolve();
+		}).catch(er => {
+			logger.warn(`(${msg.author.id}) Unhandled exception running command ${command.cmd} ${command.args.join(' ')}\n${er.stack}`);
+			commandErrorResponse(msg, null, er);
+			return resolve();
+		});
+	});
+}
+module.exports.runCommand = runCommand;
+
+function commandErrorResponse(msg, message = 'An error occured processing your command.', er = null) {
+	return new Promise((resolve, reject) => {
+		var extratext = "";
+		if (response)
+			extratext += response;
+
+		if (er && Utility.isBotAdmin(msg.author)) {
+			extratext += `\n\nError Details:\n\`${(er.message || er)}\``;
+			if (er.stack)
+				extratext += `\n\nStacktrace:\n\`\`\`\n${er.stack}\n\`\`\``;
+		}
+		msg.channel.send(message + (extratext || '')).then(resolve).catch(Utility.messageCatch);
+	});
+}
+
+function internalCommandHandler(cmd, args, msg) {
+	return new Promise((resolve, reject) => {
+		switch (cmd) {
+			case 'eval': {
+				var evalString = args.join(' ');
+				logger.info(`${msg.author.username} / ${msg.author.id} running EVAL: "${evalString}"`);
+				var output;
 				let startTime = Date.now();
-				child_process.exec(args, processOutput);
+				try {
+					output = eval(evalString);	// jshint ignore: line
+				} catch (er) {
+					msg.channel.sendEmbed({
+						title: `Unhandled Exception`,
+						description: `\`\`\`${er.stack}\`\`\``
+					}).catch(Utility.messageCatch);
+					return resolve();
+				}
+				let elapsedTime = Date.now() - startTime;
+
+				msg.channel.sendEmbed({
+					title: `Evaluation Complete! | ${elapsedTime}ms`,
+					description: `\`\`\`${output}\`\`\``
+				}).catch(Utility.messageCatch);
+				return resolve();
+			}
+			case 'exec': {
+				let startTime = Date.now();
+				child_process.exec(args.join(' '), processOutput);
 				let elapsed = Date.now() - startTime;
 
-				var processOutput = (err, stdout, stderr) => {
+				function processOutput(err, stdout, stderr) {
 					if (err)
 						return reject(err);
 
-					var returnText = `:notepad_spiral: Executed \`${args}\` in ${elapsed}ms\n\n`;
+					var returnText = "";
 
-					returnText += `STDOUT:\n\`\`\`\n${stdout||"None"}\n\`\`\``;
+					returnText += `STDOUT:\n\`\`\`\n${stdout}\n\`\`\``;
 
 					if (stderr)
-						returnText += `\nSTDERR:\n\`\`\`\n${stderr||"\n"}\n\`\`\``;
-					
-					if (returnText.length > 2000) {
-						msg.edit(`\`${args}\`\n\nExecuted, but results are too big. Took ${elapsed}ms. Please check the console.`).catch(SC);
-						logger.info(`Command results too big: ${args}`);
-						logger.info(returnText);
-						return resolve(true);
-					}
-					
-					msg.edit(returnText).then(() => {
-						return resolve(true);
-					}).catch(reject);
-				};
-				break;
-			}
-			case "cowsay": {
-				var say = (content) => {
-					msg.edit(`\`\`\`${require('cowsay').say({text: content})}\n\`\`\``).then(() => {
-						return resolve(true);
-					}).catch(reject);
-				};
-					
-				if (!args) {				
-					Request.get("https://helloacm.com/api/fortune/", (err, res, body) =>
-					{
-						if (err)
-							return reject(err);
-						
-						if (res.statusCode != 200) {
-							msg.edit("Cowsay: Failed to retreive fortune.").then(() => {
-								return resolve(true);
-							}).catch(SC);
-							return;
-						}
-						
-						try {
-							var content = JSON.parse(body).trim();
-							say(content||"Wut");
-						} catch(ex) {
-							return reject(ex);
-						}
+						returnText += `\n\nSTDERR:\n\`\`\`\n${stderr}\n\`\`\``;
+
+					msg.channel.sendEmbed({
+						title: `Execution Complete! | ${elapsed}ms`,
+						description: returnText
 					});
-				} else {
-					say(args);
 				}
-				break;
+				return resolve();
 			}
-			case "query": {
-				Database.Query(args).then((results, fields) => {
-					let builder = "";
-					builder += JSON.stringify(results, null, 4);
-					msg.edit(`\`\`\`\n${builder}\n\`\`\``).then(() => {
-						return resolve(true);
-					}).catch(reject);
-				}).catch((err) => {
-					msg.edit(`Error running \`${args}\`\n\`\`\`\n${err}\n\`\`\``).then(() => {
-						return resolve(true);
-					}, reject);
-				});
-				break;
-			}
-			case "tag": {
-				Database.Query("SELECT `text` FROM `tags` WHERE `title` = ?", [args]).then((results, fields) => {
-					if (results.length < 1) {
-						msg.edit(`Tag \`${args}\` not found`).then(() => {
-							return resolve(true);
-						}, reject);
-						return;
-					}
-					
-					msg.edit(results[0].text).then(() => {
-						return resolve(true);
-					}, reject);
-					return resolve(true);
-				}, reject);
-				break;
-			}
-			case "addtag": {
-				
-				break;
-			}
+
 			default:
-				return resolve(false);
+				return reject(new Error('Command not implemented.'));
 		}
 	});
 }
-module.exports.Run = Run;
+module.exports.internalCommandHandler = internalCommandHandler;
+
+function parseCommand(text, prefix) {
+	let cmdStr = text.substr(prefix.length, text.length);
+	let splitCmd = cmdStr.split(" ");
+
+	let command = splitCmd[0].toLowerCase();
+	let args = splitCmd.splice(1);
+
+	return { cmd: command, args: args };
+}

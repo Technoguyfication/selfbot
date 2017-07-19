@@ -1,22 +1,33 @@
 {
-	"Client": {
-		"Token": "Client-Token-Here",
-		"Options": {
-			"sync": true
+	"Bot": {
+		"Admins": [ "Snowflake", "Snowflake" ]
+	},
+	"Discord": {
+		"Token": "my-authentication-key-here",
+		"Prefix": {
+			"Prefixes": [ ">>", "!", ">", "^" ],
+			"Mention": true
+		},
+		"ClientOptions": {
+			"fetchAllMembers": true,
+			"ws": {
+				"large_threshold": 50
+			}
 		}
 	},
 	"Logging": {
 		"Level": "info",
-		"UseJSON": false,
-		"FilePattern": "yyyy-M-d.log"
-	},
-	"Bot": {
-		"Prefix": "s."
+		"Prefix": "lexi-",
+		"DatePattern": "yyyy-M-d",
+		"Container": "logs",
+		"JSON": false
 	},
 	"MySQL": {
-		"Host": "mysql.example.com",
-		"User": "mydatabaseuser",
-		"Password": "mysupersecurepassword",
-		"Database": "selfbot"
+		"Hostname": "database.example.com",
+		"Authentication": {
+			"User": "mydbuser",
+			"Password": "mypassword"
+		},
+		"Database": "lexi"
 	}
 }
