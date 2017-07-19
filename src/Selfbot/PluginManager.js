@@ -148,7 +148,7 @@ function disableAllPlugins() {
 		logger.info('Disabling all plugins...');
 		var disableQueue = [];
 		for (var plugin in pluginList) {
-			if (pluginList[plugin].status != PluginStatus.DISABLED)
+			if (pluginList[plugin].status !== PluginStatus.DISABLED)
 				disableQueue.push(unrejectable(disablePlugin(pluginList[plugin])));
 		}
 		Promise.all(disableQueue).then(resolve).catch(er => {
@@ -164,7 +164,7 @@ function enableAllPlugins() {
 		logger.verbose('Enabling all plugins..');
 		var enableQueue = [];
 		for (var plugin in pluginList) {
-			if (pluginList[plugin].status != PluginStatus.ENABLED)
+			if (pluginList[plugin].status !== PluginStatus.ENABLED)
 				enableQueue.push(unrejectable(enablePlugin(pluginList[plugin])));
 		}
 		Promise.all(enableQueue).then(resolve).catch(er => {
@@ -228,7 +228,7 @@ module.exports.refreshPluginFiles = refreshPluginFiles;
 
 function getPlugin(name) {
 	for (var plugin in pluginList) {
-		if (pluginList[plugin].name == name)
+		if (pluginList[plugin].name === name)
 			return pluginList[plugin];
 	}
 	throw new Error(`Could not find plugin by name ${name}`);

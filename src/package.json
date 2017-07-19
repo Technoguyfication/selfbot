@@ -1,5 +1,5 @@
 {
-  "name": "Lexi",
+  "name": "Selfbot",
   "description": "DO NOT PUBLISH THIS TO NPM",
   "author": "Hayden Andreyka <haydenandreyka@gmail.com>",
   "version": "1.0.0",
@@ -14,6 +14,6 @@
 	"mysql": "*"
   },
   "scripts": {
-    "test": "node ./node_modules/jshint/bin/jshint Lexi/"
+    "test": "node ./node_modules/jshint/bin/jshint Selfbot/"
   }
 }

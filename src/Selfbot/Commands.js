@@ -29,10 +29,10 @@ module.exports.builtinCommands = builtinCommands;
 function isValidCommand(msg) {
 	for (var i = 0; i < prefixes.length; i++) {
 		if (msg.content.startsWith(prefixes[i]))
-			return { isCommand: true, prefix: prefixes[i] };	// return prefix aswell so we don't have to find it twice
+			return prefixes[i];
 	}
 
-	return { isCommand: false };
+	return false;
 }
 module.exports.isValidCommand = isValidCommand;
 
@@ -105,40 +105,32 @@ function internalCommandHandler(cmd, args, msg) {
 				try {
 					output = eval(evalString);	// jshint ignore: line
 				} catch (er) {
-					msg.channel.sendEmbed({
-						title: `Unhandled Exception`,
-						description: `\`\`\`${er.stack}\`\`\``
-					}).catch(Utility.messageCatch);
+					msg.edit(`\`Unhandled Exception\`  \`${evalString}\`\n\`\`\`\n${er}\n\`\`\``).catch(Utility.messageCatch);
 					return resolve();
 				}
 				let elapsedTime = Date.now() - startTime;
 
-				msg.channel.sendEmbed({
-					title: `Evaluation Complete! | ${elapsedTime}ms`,
-					description: `\`\`\`${output}\`\`\``
-				}).catch(Utility.messageCatch);
+				msg.edit(`Evaluated \`${evalString}\` in ${elapsed}ms\n\`\`\`\n${output}\n\`\`\``).catch(Utility.messageCatch);
 				return resolve();
 			}
 			case 'exec': {
+				let execString = args.join(' ');
 				let startTime = Date.now();
-				child_process.exec(args.join(' '), processOutput);
+				child_process.exec(execString, processOutput);
 				let elapsed = Date.now() - startTime;
 
-				function processOutput(err, stdout, stderr) {
+				let processOutput = function(err, stdout, stderr) {
 					if (err)
 						return reject(err);
 
-					var returnText = "";
+					var returnText = `Processed \`${execString}\` in ${elapsed}ms\n`;
 
-					returnText += `STDOUT:\n\`\`\`\n${stdout}\n\`\`\``;
+					returnText += `STDOUT:\n\`\`\`\n${stdout||"\n"}\n\`\`\``;
 
 					if (stderr)
 						returnText += `\n\nSTDERR:\n\`\`\`\n${stderr}\n\`\`\``;
 
-					msg.channel.sendEmbed({
-						title: `Execution Complete! | ${elapsed}ms`,
-						description: returnText
-					});
+					msg.edit(returnText).catch(Utility.messageCatch);
 				}
 				return resolve();
 			}
