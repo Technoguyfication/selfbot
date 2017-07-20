@@ -358,6 +358,32 @@ function getCommandInfo(command) {
 }
 module.exports.getCommandInfo = getCommandInfo;
 
+function getAllCommands(includeAliases = false) {
+	var commands = [];
+
+	// populate list with builtin commands
+	for (let cmd in Commands.builtinCommands) {
+		addCommand(cmd);
+	}
+
+	// now add every command from every plugin
+	for (let plugin in pluginList) {
+		for (let cmd in pluginList[plugin].PluginInfo.commands) {
+			addCommand(cmd);
+		}
+	}
+
+	return commands;
+
+	function addCommand(cmd) {
+		if (getCommandInfo(cmd).alias && !includeAliases)
+			return;
+
+		commands.push(cmd);
+	}
+}
+module.exports.getAllCommands = getAllCommands;
+
 function unrejectable(_promise) {
 	return new Promise((resolve, reject) => {
 		_promise.then(() => {

@@ -15,7 +15,7 @@ const pluginInfo = {
 			scope: Commands.CommandScope.ALL
 		},
 		'tags': {
-			description: 'Lists all tags in this channel.',
+			description: 'Lists all tags.',
 			usage: 'None',
 			scope: Commands.CommandScope.ALL
 		},
@@ -25,7 +25,7 @@ const pluginInfo = {
 			scope: Commands.CommandScope.ALL
 		},
 		'deletetag': {
-			description: 'Deletes a tag in this channel.',
+			description: 'Deletes a tag.',
 			usage: 'deletetag (tag name)',
 			scope: Commands.CommandScope.ALL
 		},

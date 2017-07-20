@@ -8,6 +8,11 @@ const CommandScope = {
 module.exports.CommandScope = CommandScope;
 
 const builtinCommands = {
+	'help': {
+		description: 'Displays a list of commands or the help topic for a specific command.',
+		usage: 'help [command]',
+		scope: CommandScope.ALL
+	},
 	'eval': {
 		description: 'Evaluates a JavaScript expression.',
 		usage: 'eval (expression)',
@@ -16,11 +21,6 @@ const builtinCommands = {
 	'exec': {
 		description: 'Runs a command at the local command line.',
 		usage: 'exec (command)',
-		scope: CommandScope.ALL
-	},
-	'help': {
-		description: 'Displays a list of commands or the help topic for a specific command.',
-		usage: 'help [command]',
 		scope: CommandScope.ALL
 	}
 };
@@ -76,7 +76,7 @@ function runCommand(msg, prefix) {
 			return resolve();
 		}
 
-		logger.info(`Running command ${command.cmd} with args "${command.args.join(' ')}"`);
+		logger.info(`Running command "${command.cmd}" with args "${command.args.join(' ')}"`);
 
 		executor(command.cmd, command.args, msg).then(() => {
 			logger.debug(`finished running command ${command.cmd}`);
@@ -138,13 +138,27 @@ function internalCommandHandler(cmd, args, msg) {
 				return resolve();
 			}
 			case 'help': {
-				let commandInfo = PluginManager.getCommandInfo(cmd);
+				var command = args[0];
+				if (!command) {	// no command specified, list commands
+					var builder = "**Commands**\nUse \`help (command name)\` for usage details.\n";
+					var commands = PluginManager.getAllCommands(false);
+					commands.forEach((command) => {
+						var cmdInfo = PluginManager.getCommandInfo(command);
+						builder += `\n**${command}** - ${cmdInfo.description}`;
+					});
+
+					msg.edit(builder).catch(Utility.messageCatch);
+					return resolve();
+				}
+
+				var commandInfo = PluginManager.getCommandInfo(command);
+
 				if (!commandInfo) {
 					msg.edit(`Command info for \`${cmd}\` not found.`).catch(Utility.messageCatch);
 					return resolve();
 				}
 
-				msg.edit(`\`${cmd}\`\n\n${commandInfo.description}\nUsage: \`${commandInfo.usage}\``).catch(Utility.messageCatch);
+				msg.edit(`**${command}**\n\n${commandInfo.description}\nUsage: \`${commandInfo.usage}\``).catch(Utility.messageCatch);
 				return resolve();
 			}
 
