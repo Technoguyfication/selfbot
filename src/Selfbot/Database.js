@@ -54,7 +54,7 @@ function Terminate() {
 		});
 	});
 }
-module.exports.Terminate = Terminate();
+module.exports.Terminate = Terminate;
 
 function initDb() {
 	return new Promise((resolve, reject) => {
