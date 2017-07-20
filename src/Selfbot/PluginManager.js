@@ -102,7 +102,7 @@ function enablePlugin(plugin) {
 				}).catch(er => {
 					let pName = plugin.intName;
 					unloadPlugin(plugin);
-					return reject(`Uncaught exception enabling ${pName}:\n${er.stack}`);
+					return reject(`Uncaught exception enabling ${pName}:\n${er.stack||er}`);
 				});
 				break;
 			case PluginStatus.ENABLED:	// already enabled
@@ -167,7 +167,12 @@ function enableAllPlugins() {
 		var enableQueue = [];
 		for (var plugin in pluginList) {
 			if (pluginList[plugin].status !== PluginStatus.ENABLED)
-				enableQueue.push(unrejectable(enablePlugin(pluginList[plugin])));
+				enableQueue.push(new Promise((resolve, reject) => {
+					enablePlugin(pluginList[plugin]).then(resolve, (err) => {
+						logger.warn(err);
+						return resolve();
+					});
+				}));
 		}
 		Promise.all(enableQueue).then(resolve).catch(er => {
 			logger.warn(`Failed enabling all plugins:\n${er.stack}`);

@@ -2,6 +2,8 @@
 	Tags
 */
 
+const dbInit = __dirname + '/Tags/init.sql';
+
 const pluginInfo = {
 	name: 'Tags',
 	author: 'Hayden Andreyka <haydenandreyka@gmail.com>',
@@ -46,9 +48,17 @@ class Tags extends PluginManager.Plugin {
 	// override
 	onEnable() {
 		return new Promise((resolve, reject) => {
-			// perform db checks, etc. here
-			this.message('Ready!');
-			return resolve();
+			this.message('Initializing...');
+			fs.readFile(dbInit, 'utf8', (err, data) => {
+				if (err)
+					return reject(`Failed to read database script: ${err}`);
+
+				Database.Query(data).then(() => {
+					this.message(`Database linked`);
+					this.message(`Done`);
+					return resolve();
+				}, reject);
+			});
 		});
 	}
 
