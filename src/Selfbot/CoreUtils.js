@@ -25,7 +25,7 @@ function Shutdown() {
 	}).then(() => {
 		return new Promise((resolve, reject) => {
 			if (Database)
-				Database.Terminate.then(resolve);
+				Database.Terminate().then(resolve);
 			else return resolve();
 		});
 	}).then(() => {
