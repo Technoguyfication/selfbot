@@ -37,8 +37,9 @@ function Start() {
 			return enableAllPlugins();
 		}).then(() => {
 			logger.info(`All plugins enabled.`);
+			return resolve();
 		}).catch(er => {
-			logger.error(`Error occured loading and enabling plugins:\n${er.stack}`);
+			return reject(`Error occured loading and enabling plugins:\n${er.stack||er}`);
 		});
 	});
 }
@@ -56,7 +57,7 @@ function disablePlugin(plugin) {
 					let pName = plugin.intName;
 					unloadPlugin(plugin);
 					return reject(`${pName} took too long to disable, unloading.`);
-				}, 30 * 1000);	// 30s
+				}, 10 * 1000);	// 30s
 
 				plugin.emit('stopping');
 				plugin.onDisable().then(() => {
@@ -151,10 +152,13 @@ function disableAllPlugins() {
 		var disableQueue = [];
 		for (var plugin in pluginList) {
 			if (pluginList[plugin].status !== PluginStatus.DISABLED)
-				disableQueue.push(unrejectable(disablePlugin(pluginList[plugin])));
+				disableQueue.push(disablePlugin(pluginList[plugin]).then(resolve, (err) => {
+					logger.warn(err);
+					return resolve();
+				}));
 		}
 		Promise.all(disableQueue).then(resolve).catch(er => {
-			logger.warn(`Failed disabling all plugins:\n${er.stack}`);
+			logger.warn(er.stack||er);
 			return resolve();
 		});
 	});
