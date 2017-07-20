@@ -10,11 +10,19 @@ global.PluginManager = require('./PluginManager.js');
 // start bot by logging in etc.
 function botStart() {
 	return new Promise((resolve, reject) => {
-		logger.info("Logging in to Discord...");
-		BotClient.login(Config.Discord.Token).then(token => {
-			logger.info('Client login complete.');
-			logger.debug(`Token: ${token}`);
-			PluginManager.Start().then(resolve, reject);
+
+		new Promise((resolve, reject) => {
+			return PluginManager.Start();
+		}).then(() => {
+			return Botclient.login(Config.Discord.Token);
+		}).then((token) => {
+			return new Promise((resolve, reject) => {
+				logger.info('Client login complete.');
+				logger.debug(`Token: ${token}`);
+				return resolve();
+			});
+		}).then(() => {
+			return resolve();
 		}).catch(err => {
 			logger.error(`Failed to login to Discord: ${err.stack}`);
 			exit(1);

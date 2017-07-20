@@ -24,7 +24,7 @@ new Promise((resolve, reject) => {
 		global.logger = new winston.Logger({
 			level: Config.Logging.Level,
 			transports: [
-				new (winston.transports.Console)(),
+				new winston.transports.Console(),
 				new wdrf({
 					filename: path.join(Config.Logging.Container, Config.Logging.Prefix),
 					datePattern: Config.Logging.DatePattern + '.log',

@@ -239,7 +239,7 @@ module.exports.getPlugin = getPlugin;
 
 function unloadPlugin(plugin) {
 	logger.info(`Unloading plugin ${plugin.intName}`);
-	delete (pluginList[plugin.intName]);
+	delete pluginList[plugin.intName];
 }
 module.exports.unloadPlugin = unloadPlugin;
 

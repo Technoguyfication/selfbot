@@ -22,7 +22,7 @@ const builtinCommands = {
 		description: 'Displays a list of commands or the help topic for a specific command.',
 		usage: 'help [command]',
 		scope: CommandScope.ALL
-	},
+	}
 };
 module.exports.builtinCommands = builtinCommands;
 
@@ -76,7 +76,7 @@ function runCommand(msg, prefix) {
 			return resolve();
 		}
 
-		logger.info(`${msg.author.id} / ${msg.author.username} executed command ${command.cmd} with args "${command.args.join(' ')}"`);
+		logger.info(`Running command ${command.cmd} with args "${command.args.join(' ')}"`);
 
 		executor(command.cmd, command.args, msg).then(() => {
 			logger.debug(`finished running command ${command.cmd}`);
@@ -128,13 +128,23 @@ function internalCommandHandler(cmd, args, msg) {
 						returnText += `\n\nSTDERR:\n\`\`\`\n${stderr}\n\`\`\``;
 
 					msg.edit(returnText).catch(Utility.messageCatch);
-				}
+				};
 
 				let execString = args.join(' ');
 				let startTime = Date.now();
 				child_process.exec(execString, processOutput);
 				let elapsed = Date.now() - startTime;
 
+				return resolve();
+			}
+			case 'help': {
+				let commandInfo = PluginManager.getCommandInfo(cmd);
+				if (!commandInfo) {
+					msg.edit(`Command info for \`${cmd}\` not found.`).catch(Utility.messageCatch);
+					return resolve();
+				}
+
+				msg.edit(`\`${cmd}\`\n\n${commandInfo.description}\nUsage: \`${commandInfo.usage}\``).catch(Utility.messageCatch);
 				return resolve();
 			}
 

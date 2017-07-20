@@ -13,3 +13,7 @@ BotClient.on('message', msg => {
 		});
 	} 
 });
+
+BotClient.on('ready', () => {
+	logger.info(`Client ready and logged in as ${BotClient.user.username}`);
+});
