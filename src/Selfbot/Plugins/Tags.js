@@ -19,7 +19,7 @@ const pluginInfo = {
 		},
 		'createtag': {
 			description: 'Creates a new tag. (Note: Accepts embeds aswell)',
-			usage: 'createtag (tag name) (tag text)',
+			usage: 'createtag (tag name) (tag content)',
 			scope: Commands.CommandScope.ALL
 		},
 		'deletetag': {
@@ -97,6 +97,19 @@ class Tags extends PluginManager.Plugin {
 					break;
 				}
 				case 'createtag': {
+					if (args.length < 2) {
+						if (args.length === 1 && msg.attachments.length > 1)	// if there are attachments on the message
+							return;
+
+						msg.edit(`Usage: \`${pluginInfo.commands.createtag.usage}\`\nPlease see the help article for more information.`).catch(Utility.messageCatch);
+						return resolve();
+					}
+
+					var tagName = args.shift();
+					var tagContent = args.join(' ');
+
+
+					//Database.Query('SELECT null FROM `tags` WHERE `title` = ?', [
 					break;
 				}
 				case 'deletetag': {
