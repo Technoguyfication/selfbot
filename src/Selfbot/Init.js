@@ -16,7 +16,7 @@ new Promise((resolve, reject) => {
 	return resolve();
 }).then(() => {
 	return new Promise((resolve, reject) => {
-		var logdir = __dirname + '/../' + Config.Logging.Container;
+		var logdir = `${__dirname}/../${Config.Logging.Container}/`;
 
 		if (!fs.existsSync(logdir))
 			fs.mkdirSync(logdir);
@@ -26,7 +26,7 @@ new Promise((resolve, reject) => {
 			transports: [
 				new winston.transports.Console(),
 				new wdrf({
-					filename: path.join(Config.Logging.Container, Config.Logging.Prefix),
+					filename: path.join(logdir, Config.Logging.Prefix||"log-"),
 					datePattern: Config.Logging.DatePattern + '.log',
 					json: Config.Logging.JSON
 				})

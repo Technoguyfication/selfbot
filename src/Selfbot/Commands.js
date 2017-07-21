@@ -22,6 +22,11 @@ const builtinCommands = {
 		description: 'Runs a command at the local command line.',
 		usage: 'exec (command)',
 		scope: CommandScope.ALL
+	},
+	'query': {
+		description: 'Runs a query on the bot database.',
+		usage: 'query (sql query)',
+		scope: CommandScope.ALL
 	}
 };
 module.exports.builtinCommands = builtinCommands;
@@ -49,6 +54,7 @@ function runCommand(msg, prefix) {
 		}
 
 		let cmdInfo = PluginManager.getCommandInfo(command.cmd);
+		command.cmd = cmdInfo.cmd;
 
 		switch (cmdInfo.scope) {
 			case CommandScope.ALL:
@@ -154,14 +160,24 @@ function internalCommandHandler(cmd, args, msg) {
 				var commandInfo = PluginManager.getCommandInfo(command);
 
 				if (!commandInfo) {
-					msg.edit(`Command info for \`${cmd}\` not found.`).catch(Utility.messageCatch);
+					msg.edit(`Command info for \`${command}\` not found.`).catch(Utility.messageCatch);
 					return resolve();
 				}
 
-				msg.edit(`**${command}**\n\n${commandInfo.description}\nUsage: \`${commandInfo.usage}\``).catch(Utility.messageCatch);
+				msg.edit(`**${commandInfo.cmd}**\n\n${commandInfo.description}\nUsage: \`${commandInfo.usage}\``).catch(Utility.messageCatch);
 				return resolve();
 			}
-
+			case 'query': {
+				var query = args.join(' ');
+				Database.Query(query).then((results, fields) => {
+					msg.edit(`Results of query \`${query}\`\n\`\`\`json\n${JSON.stringify(results, null, 4)}\n\`\`\``).catch(Utility.messageCatch);
+					return resolve();
+				}).catch((err) => {
+					msg.edit(`Failed to run query: ${err}`);
+					return resolve();
+				});
+				break;
+			}
 			default:
 				return reject(new Error('Command not implemented.'));
 		}

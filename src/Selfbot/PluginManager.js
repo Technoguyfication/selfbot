@@ -328,9 +328,9 @@ function getCommandInfo(command) {
 			return;
 		}
 
-		for (let alias in commandAliases[cmd]) {
-			addInfo(commandAliases[cmd][alias], commandInfo[cmd]);
-		}
+		commandAliases[cmd].forEach((alias) => {
+			commandInfo[alias] = commandInfo[cmd];
+		});
 	}
 
 	Cache.Add('commandInfo', commandInfo, 9e5);	// 15 minutes
@@ -341,6 +341,7 @@ function getCommandInfo(command) {
 		return null;
 
 	function addInfo(cmd, info) {
+		info.cmd = cmd;
 		if (info.alias) {
 			if (commandAliases[info.alias]) {
 				commandAliases[info.alias].push(cmd);

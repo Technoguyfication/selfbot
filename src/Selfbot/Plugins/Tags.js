@@ -10,14 +10,12 @@ const pluginInfo = {
 	version: '1.0.0',
 	commands: {
 		'tag': {
-			description: 'Displays a tag. Use `tags` to get started.',
-			usage: 'tag (tag name)',
+			description: 'Displays a tag or lists available tags.',
+			usage: 'tag [tag name]',
 			scope: Commands.CommandScope.ALL
 		},
 		'tags': {
-			description: 'Lists all tags.',
-			usage: 'None',
-			scope: Commands.CommandScope.ALL
+			alias: 'tag'
 		},
 		'createtag': {
 			description: 'Creates a new tag. (Note: Accepts embeds aswell)',
@@ -59,6 +57,52 @@ class Tags extends PluginManager.Plugin {
 					return resolve();
 				}, reject);
 			});
+		});
+	}
+
+	onCommand(cmd, args, msg) {
+		return new Promise((resolve, reject) => {
+			switch (cmd) {
+				case 'tag': {
+					if (!args[0]) {
+						Database.Query('SELECT `title` FROM `tags`').then((results, fields) => {
+							var builder = "Tags:\n```\n";
+							results.forEach((result) => {
+								builder += `${result.title} `;
+							});
+							builder += '```';	// close code pen
+							msg.edit(builder).catch(Utility.messageCatch);
+							return resolve();
+						}).catch((err) => {
+							msg.edit(`Error getting tags: ${err}`);
+							return resolve();
+						});
+						break;
+					}
+
+					var tag = args[0];
+
+					Database.Query('SELECT `text` FROM `tags` WHERE `title` = ?', [tag]).then((results, fields) => {
+						if (results.length < 1) {
+							msg.edit(`Tag not found: \`${tag}\``).catch(Utility.messageCatch);
+							return resolve();
+						}
+
+						msg.edit(results[0].text).catch(Utility.messageCatch);
+						return resolve();
+					}).catch((err) => {
+						msg.edit(`Failed to retreive tag \`${tag}\`: ${err}`);
+						return resolve();
+					});
+					break;
+				}
+				case 'createtag': {
+					break;
+				}
+				case 'deletetag': {
+					break;
+				}
+			}
 		});
 	}
 

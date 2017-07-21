@@ -11,7 +11,7 @@
 	},
 	"Logging": {
 		"Level": "info",
-		"Prefix": "",
+		"Prefix": "selfbot-",
 		"DatePattern": "yyyy-M-d",
 		"Container": "logs",
 		"JSON": false
