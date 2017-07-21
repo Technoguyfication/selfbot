@@ -97,10 +97,7 @@ class Tags extends PluginManager.Plugin {
 					break;
 				}
 				case 'createtag': {
-					if (args.length < 2) {
-						if (args.length === 1 && msg.attachments.length > 1)	// if there are attachments on the message
-							return;
-
+					if (args.length < 2 && !(args.length <= 1 && msg.attachments.size > 0)) {	// not enough args AND there are no attachments to fill content arg
 						msg.edit(`Usage: \`${pluginInfo.commands.createtag.usage}\`\nPlease see the help article for more information.`).catch(Utility.messageCatch);
 						return resolve();
 					}
@@ -108,8 +105,22 @@ class Tags extends PluginManager.Plugin {
 					var tagName = args.shift();
 					var tagContent = args.join(' ');
 
+					msg.attachments.forEach((attachment) => {
+						tagContent += ` ${attachment.url}`;
+					});
 
-					//Database.Query('SELECT null FROM `tags` WHERE `title` = ?', [
+					Database.Query('INSERT INTO `tags` (`title`, `text`) VALUES (?, ?)', [tagName, tagContent]).then((results, fields) => {
+						msg.edit(`Tag \`${tagName}\` added!`).catch(Utility.messageCatch);
+						return resolve();
+					}).catch((err) => {
+						if (err.code == 'ER_DUP_ENTRY') {
+							msg.edit(`Tag \`${tagName}\` already exists. Please delete it or specify a different name.`).catch(Utility.messageCatch);
+							return resolve();
+						} else {
+							msg.edit(`Error adding tag \`${tagName}\`: ${err.code}: ${err.sqlMessage}`).catch(Utility.messageCatch);
+							return resolve();
+						}
+						});
 					break;
 				}
 				case 'deletetag': {
