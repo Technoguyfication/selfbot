@@ -113,7 +113,7 @@ class Tags extends PluginManager.Plugin {
 						msg.edit(`Tag \`${tagName}\` added!`).catch(Utility.messageCatch);
 						return resolve();
 					}).catch((err) => {
-						if (err.code == 'ER_DUP_ENTRY') {
+						if (err.code === 'ER_DUP_ENTRY') {
 							msg.edit(`Tag \`${tagName}\` already exists. Please delete it or specify a different name.`).catch(Utility.messageCatch);
 							return resolve();
 						} else {
@@ -124,7 +124,9 @@ class Tags extends PluginManager.Plugin {
 					break;
 				}
 				case 'deletetag': {
-					break;
+					/*if (args.length > 1 < 2) {
+
+					}*/
 				}
 			}
 		});
