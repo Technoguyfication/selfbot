@@ -137,7 +137,7 @@ function loadPlugin(plugin) {
 		_p.onDisable.bind(_p);
 
 		if (pluginList[_p.intName])
-			throw new Error('Plugin already loaded.');
+			throw new Error(`Plugin already loaded: ${_p.intName}`);
 
 		pluginList[_p.intName] = _p;				// add to list of loaded plugins
 		logger.verbose(`Loaded plugin ${_p.intName}`);
@@ -222,13 +222,13 @@ function refreshPluginFiles() {
 			// prune anything not ending with the extension
 			if (!entries[i].endsWith(pluginExtension)) {
 				entries.splice(i, 1);
-				break;
+				continue;
 			}
 
 			// prune folders out
 			if (!fs.statSync(fullPluginDir + entries[i]).isFile()) {
 				entries.splice(i, 1);
-				break;
+				continue;
 			}
 		}
 		pluginFileList = entries;
