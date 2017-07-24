@@ -22,6 +22,7 @@
     <Compile Include="Selfbot\Cache.js">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Selfbot\Plugins\Shitposting.js" />
     <Compile Include="Selfbot\Utility.js">
       <SubType>Code</SubType>
     </Compile>
