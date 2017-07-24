@@ -27,6 +27,19 @@ const builtinCommands = {
 		description: 'Runs a query on the bot database.',
 		usage: 'query (sql query)',
 		scope: CommandScope.ALL
+	},
+	'update': {
+		description: 'Updates the bot using it\'s git repo and shuts down.',
+		usage: '(none)',
+		scope: CommandScope.ALL
+	},
+	'shutdown': {
+		description: 'Shuts down the bot.',
+		usage: '(none)',
+		scope: CommandScope.ALL
+	},
+	'stop': {
+		alias: 'shutdown'
 	}
 };
 module.exports.builtinCommands = builtinCommands;
@@ -106,9 +119,9 @@ function internalCommandHandler(cmd, args, msg) {
 	return new Promise((resolve, reject) => {
 		switch (cmd) {
 			case 'eval': {
-				var evalString = args.join(' ');
+				let evalString = args.join(' ');
 				logger.info(`${msg.author.username} / ${msg.author.id} running EVAL: "${evalString}"`);
-				var output;
+				let output;
 				let startTime = Date.now();
 				try {
 					output = eval(evalString);	// jshint ignore: line
@@ -122,7 +135,7 @@ function internalCommandHandler(cmd, args, msg) {
 				return resolve();
 			}
 			case 'exec': {
-				var processOutput = function (err, stdout, stderr) {
+				let processOutput = function (err, stdout, stderr) {
 					if (err)
 						return reject(err);
 
@@ -144,12 +157,12 @@ function internalCommandHandler(cmd, args, msg) {
 				return resolve();
 			}
 			case 'help': {
-				var command = args[0];
+				let command = args[0];
 				if (!command) {	// no command specified, list commands
-					var builder = "**Commands**\nUse \`help (command name)\` for usage details.\n";
-					var commands = PluginManager.getAllCommands(false);
+					let builder = "**Commands**\nUse \`help (command name)\` for usage details.\n";
+					let commands = PluginManager.getAllCommands(false);
 					commands.forEach((command) => {
-						var cmdInfo = PluginManager.getCommandInfo(command);
+						let cmdInfo = PluginManager.getCommandInfo(command);
 						builder += `\n**${command}** - ${cmdInfo.description}`;
 					});
 
@@ -157,7 +170,7 @@ function internalCommandHandler(cmd, args, msg) {
 					return resolve();
 				}
 
-				var commandInfo = PluginManager.getCommandInfo(command);
+				let commandInfo = PluginManager.getCommandInfo(command);
 
 				if (!commandInfo) {
 					msg.edit(`Command info for \`${command}\` not found.`).catch(Utility.messageCatch);
@@ -168,7 +181,7 @@ function internalCommandHandler(cmd, args, msg) {
 				return resolve();
 			}
 			case 'query': {
-				var query = args.join(' ');
+				let query = args.join(' ');
 				Database.Query(query).then((results, fields) => {
 					msg.edit(`Results of query \`${query}\`\n\`\`\`json\n${JSON.stringify(results, null, 4)}\n\`\`\``).catch(Utility.messageCatch);
 					return resolve();
@@ -177,6 +190,32 @@ function internalCommandHandler(cmd, args, msg) {
 					return resolve();
 				});
 				break;
+			}
+			case 'update': {
+				const updateCommand = 'git pull';
+				let startTime = Date.now();
+				child_process.exec(updateCommand, (err, stdout, stderr) => {
+					let elapsed = Date.now() - startTime;
+
+					if (err) {
+						let resp = `Error running update: ${err}`;
+						logger.warn(resp);
+						msg.edit(resp).catch(Utility.messageCatch);
+						return resolve();
+					}
+
+					let builder = `Fetched update in ${elapsed}ms\n\`\`\`\n${stdout}\n\`\`\``;
+					if (stderr)
+						builder += `\nSTDERR:\\n\`\`\`\n${stderr}\n\`\`\``;
+
+					msg.edit(builder).catch(Utility.messageCatch);
+					return resolve();
+				});
+				break;
+			}
+			case 'shutdown': {
+				msg.delete().then(Shutdown, Shutdown);
+				return resolve();
 			}
 			default:
 				return reject(new Error('Command not implemented.'));
