@@ -84,7 +84,7 @@ class Tags extends PluginManager.Plugin {
 
 					Database.Query('SELECT `text` FROM `tags` WHERE `title` = ?', [tag]).then((results, fields) => {
 						if (results.length < 1) {
-							msg.edit(`Tag not found: \`${tag}\``).catch(Utility.messageCatch);
+							msg.edit(`Tag \`${tag}\` does not exist.`).catch(Utility.messageCatch);
 							return resolve();
 						}
 
@@ -102,8 +102,8 @@ class Tags extends PluginManager.Plugin {
 						return resolve();
 					}
 
-					var tagName = args.shift();
-					var tagContent = args.join(' ');
+					let tagName = args.shift();
+					let tagContent = args.join(' ');
 
 					msg.attachments.forEach((attachment) => {
 						tagContent += ` ${attachment.url}`;
@@ -124,9 +124,26 @@ class Tags extends PluginManager.Plugin {
 					break;
 				}
 				case 'deletetag': {
-					/*if (args.length > 1 < 2) {
+					if (args.length < 1) {
+						msg.edit('Please specify a tag to delete.').catch(Utility.messageCatch);
+						return resolve();
+					}
 
-					}*/
+					let tagName = args[0];
+
+					Database.Query('DELETE FROM `tags` WHERE `title` = ?', [tagName]).then((response, fields) => {
+						if (response.affectedRows === 0) {
+							msg.edit(`Could not delete tag \`${tagName}\` because it does not exist.`).catch(Utility.messageCatch);
+							return resolve();
+						}
+
+						msg.edit(`Tag \`${tagName}\` deleted!`).catch(Utility.messageCatch);
+						return resolve();
+					}).catch((err) => {
+						msg.edit(`Error deleting tag \`${tagName}\`: ${err}`).catch(Utility.messageCatch);
+						return resolve();
+						});
+					break;
 				}
 			}
 		});
