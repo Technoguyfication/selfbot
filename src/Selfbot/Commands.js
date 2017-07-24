@@ -206,7 +206,7 @@ function internalCommandHandler(cmd, args, msg) {
 
 					let builder = `Fetched update in ${elapsed}ms\n\`\`\`\n${stdout}\n\`\`\``;
 					if (stderr)
-						builder += `\nSTDERR:\\n\`\`\`\n${stderr}\n\`\`\``;
+						builder += `\nSTDERR:\n\`\`\`\n${stderr}\n\`\`\``;
 					builder += '\nShutting down.';
 
 					msg.edit(builder).catch(Utility.messageCatch).then(() => {
