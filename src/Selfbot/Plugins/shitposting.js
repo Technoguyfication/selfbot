@@ -54,13 +54,13 @@ class Shitposting extends PluginManager.Plugin {
 					let builder = "";
 					for (let i = 0; i < text.length; i++) {
 						if (text[i].toLowerCase() === 'b')			// B
-							builder += ":b:";
+							builder += ":b: ";
 						else if (text[i] === ' ')					// expand spaces to five characters
 							builder += '     ';
 						else if (text[i].match(/[A-z]+/))			// character is a letter, substitute into regional indicator
-							builder += `:regional_indicator_${text[i].toLowerCase()}:`;
+							builder += `:regional_indicator_${text[i].toLowerCase()}: `;
 						else if (text[i].match(/[0-9]/))			// character is a number, spell it out using array above
-							builder += `:${numbers[text[i]]}:`;
+							builder += `:${numbers[text[i]]}: `;
 						else										// idk, just put it in anyways											
 							builder += text[i];
 					}
