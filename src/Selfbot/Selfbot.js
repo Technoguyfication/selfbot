@@ -18,7 +18,7 @@ function botStart() {
 			logger.debug(`Client login complete. Token: ${token}`);
 			return resolve();
 		}).catch(err => {
-			logger.error(`Failed to start bot: ${err.stack}`);
+			logger.error(`Failed to start bot: ${err.stack||err}`);
 			exit(1);
 		});
 	});
