@@ -5,10 +5,11 @@ global.exit = function (code = 0) {
 	process.exit(code);
 };
 
-process.on('SIGTERM', Shutdown);
-process.on('SIGINT', Shutdown);
+process.on('SIGTERM', Sigint);
+process.on('SIGINT', Sigint);
 var shutdownStart = false;
-function Shutdown() {
+
+function Sigint() {
 	if (shutdownStart) {
 		console.log('--- Press Ctrl+C again to force kill program.');
 		process.once('SIGINT', exit);
@@ -17,8 +18,12 @@ function Shutdown() {
 	} else
 		shutdownStart = true;
 
-	logger.info('SIGTERM detected, gracefully stopping..');
+	Shutdown();
+}
+
+function Shutdown() {
 	new Promise((resolve, reject) => {
+		logger.info('Stopping');
 		if (PluginManager)
 			return PluginManager.disableAllPlugins().then(resolve);
 		else return resolve();
@@ -31,7 +36,7 @@ function Shutdown() {
 	}).then(() => {
 		exit();
 	}).catch(err => {
-		logger.warn(`Error safely shutting down: ${err.stack}`);
+		logger.warn(`Error safely shutting down: ${err.stack||err}`);
 		exit(1);
 	});
 }
