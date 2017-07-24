@@ -12,7 +12,7 @@ const mysqlConfig = {
 
 var Connections;
 
-const initScript = __dirname + '/./Data/initdb.sql';
+const initScript = __dirname + '/Data/initdb.sql';
 
 function Init() {
 	return new Promise((resolve, reject) => {
