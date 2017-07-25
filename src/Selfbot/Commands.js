@@ -111,7 +111,7 @@ module.exports.runCommand = runCommand;
 
 function commandErrorResponse(msg, message = 'An error occured processing your command.') {
 	return new Promise((resolve, reject) => {
-		msg.edit(`:no_entry: ${message}`).then(resolve, reject);
+		msg.edit(`:no_entry:    ${message}`).then(resolve, reject);
 	});
 }
 
