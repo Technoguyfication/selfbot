@@ -12,6 +12,7 @@ try {
 	global.winston = require('winston');
 	global.wdrf = require('winston-daily-rotate-file');
 	global.mysql = require('mysql');
+	global.Request = require('request');
 	global.Discord = require('discord.js');
 
 	global.Cache = require('./Selfbot/Cache.js');
