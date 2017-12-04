@@ -141,7 +141,7 @@ function internalCommandHandler(cmd, args, msg) {
 
 					var returnText = `Processed \`${execString}\` in ${elapsed}ms\n\n`;
 
-					returnText += `STDOUT:\n\`\`\`\n${stdout || " "}\n\`\`\``;
+					returnText += `STDOUT:\n\`\`\`\n${stdout || "(None)"}\n\`\`\``;
 
 					if (stderr)
 						returnText += `\n\nSTDERR:\n\`\`\`\n${stderr}\n\`\`\``;
