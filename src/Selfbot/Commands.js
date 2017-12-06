@@ -131,8 +131,23 @@ function internalCommandHandler(cmd, args, msg) {
 				}
 				let elapsedTime = Date.now() - startTime;
 
-				msg.edit(`Evaluated \`${evalString}\` in ${elapsedTime}ms\n\`\`\`\n${output}\n\`\`\``).catch(Utility.messageCatch);
-				return resolve();
+				if (output.length > 1900) {
+					Utility.uploadText(output).then((link) => {
+						reply(`Output truncated due to length, see ${link}`);
+						return resolve();
+					}).catch((err) => {
+						logger.warn(`Failed to upload eval results: ${err}`);
+						reply(`Output truncated due to length. Link unavailable: ${err}`);
+						return resolve();
+					});
+				} else {
+					reply(output);
+					return resolve();
+				}
+
+				function reply(outputText) {
+					msg.edit(`Evaluated \`${evalString}\` in ${elapsedTime}ms\n\`\`\`\n${outputText}\n\`\`\``).catch(Utility.messageCatch);
+				}
 			}
 			case 'exec': {
 				let processOutput = function (err, stdout, stderr) {
