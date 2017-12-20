@@ -145,7 +145,7 @@ function internalCommandHandler(cmd, args, msg) {
 					return resolve();
 				}
 
-				function reply(outputText) {
+				let reply = function (outputText) {
 					msg.edit(`Evaluated \`${evalString}\` in ${elapsedTime}ms\n\`\`\`\n${outputText}\n\`\`\``).catch(Utility.messageCatch);
 				}
 			}
@@ -154,15 +154,28 @@ function internalCommandHandler(cmd, args, msg) {
 					if (err)
 						return reject(err);
 
-					var returnText = `Processed \`${execString}\` in ${elapsed}ms\n\n`;
-
-					returnText += `STDOUT:\n\`\`\`\n${stdout || "(None)"}\n\`\`\``;
+					let builder = `\nSTDOUT:\n\`\`\`\n${stdout || "(None)"}\n\`\`\``;
 
 					if (stderr)
-						returnText += `\n\nSTDERR:\n\`\`\`\n${stderr}\n\`\`\``;
+						builder += `\n\nSTDERR:\n\`\`\`\n${stderr}\n\`\`\``;
 
-					msg.edit(returnText).catch(Utility.messageCatch);
+					if (builder.length > 1900) {
+						Utility.uploadText(builder).then((link) => {
+							reply(`\`\`\`Output truncated due to length, see ${link}\`\`\``);
+							return resolve();
+						}).catch((err) => {
+							reply(`\`\`\`\`Output truncated due to length. Link unavailable: ${err}\`\`\``);
+							return resolve();
+						});
+					} else {
+						reply(builder);
+						return resolve();
+					}
 				};
+
+				let reply = function (outputText) {
+					msg.edit(`Processed \`${execString}\` in ${elapsed}ms\n${outputText}`).catch(Utility.messageCatch);
+				}
 
 				let execString = args.join(' ');
 				let startTime = Date.now();
